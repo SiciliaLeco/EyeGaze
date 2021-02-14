@@ -13,3 +13,4 @@ usability: track the eye movement, provide detailed insights into users' attenti
 
 challenges: (a) low sensor quality or unknown/challenging environments, and (b) large variations in eye region appearance.
 
+notes here:https://github.com/SiciliaLeco/EyeGaze/tree/master/note
