@@ -14,3 +14,12 @@ usability: track the eye movement, provide detailed insights into users' attenti
 challenges: (a) low sensor quality or unknown/challenging environments, and (b) large variations in eye region appearance.
 
 notes here:https://github.com/SiciliaLeco/EyeGaze/tree/master/note
+
+
+### 2. timeline
+
+Week 3-4: Dataset observation, general idea on estimation.
+
+Week 4-5: In-depth learning for Appearanced-based gaze in-the-wild.
+
+Week 6: Implement multi-modal CNN for one-eye gaze estimation.
