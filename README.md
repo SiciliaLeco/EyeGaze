@@ -23,3 +23,5 @@ Week 3-4: Dataset observation, general idea on estimation.
 Week 4-5: In-depth learning for Appearanced-based gaze in-the-wild.
 
 Week 6: Implement multi-modal CNN for one-eye gaze estimation.
+
+Week 7: improve some techniques applied to the data.
