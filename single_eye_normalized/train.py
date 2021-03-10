@@ -13,6 +13,9 @@ def get_2D_vector(pose, gaze):
     return poses, gazes
 
 def batch_process(j, batch, img, pose, gaze):
+    '''
+    :return: a-img, b-pose, c-gaze
+    '''
     a = torch.randn(batch, 1, 36, 60)
     b = torch.randn(batch,2)
     c = torch.randn(batch,2)
@@ -35,7 +38,7 @@ print("test dataset size:", len(test_gaze))
 
 ### training process ###
 GazeCNN = Model()
-optimizer = torch.optim.Adam(GazeCNN.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(GazeCNN.parameters(), lr=0.0001)
 criterion = torch.nn.SmoothL1Loss(reduction="mean")
 batch = 10
 train_range = int(ltrain / batch)
@@ -44,18 +47,17 @@ test_range = int(ltest / batch)
 
 for epoch in range(10):
     for i in tqdm(range(train_range)):
-        img, gaze, pose = batch_process(i, batch, train_image, train_pose2D, train_gaze2D)
-        gaze_pred_2D = GazeCNN(img, gaze)
+        img, pose, gaze = batch_process(i, batch, train_image, train_pose2D, train_gaze2D)
+        gaze_pred_2D = GazeCNN(img, pose)
 
         loss = criterion(gaze_pred_2D, gaze)
-        loss.retain_grad()
         loss.backward()
         optimizer.step()
 
     angle_loss=0
     for j in tqdm(range(test_range)):
-        timg, tgaze, tpose = batch_process(j, batch, train_image, train_pose2D, train_gaze2D)
-        tgaze_pred_2D = GazeCNN(timg, tgaze)
+        timg, tpose, tgaze = batch_process(j, batch, train_image, train_pose2D, train_gaze2D)
+        tgaze_pred_2D = GazeCNN(timg, tpose)
         angle_loss += mean_angle_loss(tgaze_pred_2D, tgaze)
 
     print("epoch", epoch, "average loss on test dataset:", angle_loss / test_range)

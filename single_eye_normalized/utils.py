@@ -88,8 +88,8 @@ def gaze2D_to_3D(gaze):
     :param gaze: gaze (yaw, pitch) is the rotation angle, type=(list)
     :return: gaze=(x,y,z)
     '''
-    yaw = gaze[1]
     pitch = gaze[0]
+    yaw = gaze[1]
     x = -np.cos(pitch) * np.sin(yaw)
     y = -np.sin(pitch)
     z = -np.cos(pitch) * np.cos(yaw)
