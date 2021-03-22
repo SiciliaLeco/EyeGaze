@@ -22,41 +22,6 @@ def read_eye_data(mat):
     pose = right_info['pose'][0, 0]
     return gaze, image, pose
 
-
-def data_split_validation(data_dict:dict):
-    '''
-    split into two part: validation and train
-    :return:
-    '''
-    t_gaze, t_image, t_pose, v_gaze, v_image, v_pose=[],[],[],[],[],[]
-    validation = ["p00", "p01"] # set as validation set
-    for key, val in tqdm(data_dict.items()):
-        for v in val:
-            fgaze, fimage, fpose = read_eye_data(v)
-            if key in validation: # add to validation data
-                if  len(v_gaze) == 0:
-                    v_gaze = fgaze
-                    v_pose = fpose
-                    v_image = fimage
-                else:
-                    v_gaze = np.append(v_gaze, fgaze, axis = 0)
-                    v_pose = np.append(v_pose, fpose, axis = 0)
-                    v_image = np.append(v_image, fimage, axis = 0)
-            else: # add to train data
-                if len(t_gaze) == 0:
-                    t_gaze = fgaze
-                    t_pose = fpose
-                    t_image = fimage
-                else:
-                    t_gaze = np.append(t_gaze, fgaze, axis = 0)
-                    t_pose = np.append(t_pose, fpose, axis = 0)
-                    t_image = np.append(t_image, fimage, axis = 0)
-
-    return t_gaze, t_image, t_pose, v_gaze, v_image, v_pose
-
-
-
-
 def collect_data_from_mat():
     '''
     collect data from annotation part
@@ -64,22 +29,49 @@ def collect_data_from_mat():
     :return:  list of index, image, pose, gaze
     '''
     mat_files = glob.glob(path + '/Normalized/**/*.mat', recursive = True)
-    mat_files.sort()
+    # mat_files.sort()
     gaze = list()
     image = list()
     index = list()
     pose = list()
-
-    ## read data
-    for matfile in mat_files:
+    for matfile in tqdm(mat_files):
         pnum = matfile.split('/')[-2]  # pxx
         pday = matfile.split('/')[-1].split('.')[0] # day0x
-        if data_dict.__contains__(pnum) == False:
-            data_dict[pnum] = []
-        data_dict[pnum].append(matfile)
+        index.append(pnum + '/' + pday)
 
-    return data_split_validation(data_dict)
+        fgaze, fimage, fpose = read_eye_data(matfile)
 
+        if gaze == []:
+            gaze = fgaze
+            image = fimage
+            pose = fpose
+        else:
+            gaze = np.append(gaze, fgaze, axis = 0)
+            image = np.append(image, fimage, axis = 0)
+            pose = np.append(pose, fpose, axis = 0)
+
+    return gaze, image, pose, index
+
+
+def get_kfold_data(k, i, gaze, image, pose):
+    '''
+    implement k-fold validation
+    input type = numpy.narray
+    output type = numoy.narray
+    '''
+    fold_size = gaze.shape[0] // k
+    start = i * fold_size
+    if i != k - 1: # Not the final round
+        end = (i + 1) * fold_size
+        v_gaze, v_pose, v_image = gaze[start:end], pose[start:end],image[start:end]
+        t_gaze = np.concatenate((gaze[0:start], gaze[end:]), axis=0)
+        t_pose = np.concatenate((pose[0:start], pose[end:]), axis=0)
+        t_image = np.concatenate((image[0:start], image[end:]), axis=0)
+    else:
+        v_gaze, v_pose, v_image = gaze[start:], pose[start:],image[start:]
+        t_gaze, t_pose, t_image = gaze[0:start], pose[0:start],image[0:start]
+
+    return t_gaze, t_pose, t_image, v_gaze, v_pose, v_image
 
 
 def pose3D_to_2D(pose):
@@ -134,14 +126,12 @@ def mean_angle_loss(pred, truth):
     pred = pred.detach().numpy()
     ans = 0
     for i in range(len(pred)):
-        p_x, p_y, p_z = (pred[i][j] for j in range(3))
-        t_x, t_y, t_z = (truth[i][j] for j in range(3))
-        angles = (p_x * t_x + p_y * t_y + p_z * t_z)/math.sqrt(p_x**2+p_y**2+p_z**2) * math.sqrt(t_x**2+t_y**2+t_z**2)
-        ans += math.acos(angles) * 180 / np.pi
+        p_x, p_y, p_z = gaze2D_to_3D(pred[i])
+        t_x, t_y, t_z = gaze2D_to_3D(truth[i])
+        angles = p_x * t_x + p_y * t_y + p_z * t_z
+        ans += torch.acos(angles) * 180 / np.pi
     return ans / len(pred)
 
 
-t_gaze, t_image, t_pose, v_gaze, v_image, v_pose = collect_data_from_mat()
-
-print("training dataset size:", len(t_gaze))
-print("test dataset size:", len(v_gaze))
+# gaze, image, pose, index = collect_data_from_mat()
+# t_gaze, t_pose, t_image, v_gaze, v_pose, v_image=get_kfold_data(10,0,gaze,image,pose)
