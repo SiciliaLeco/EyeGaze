@@ -32,7 +32,6 @@ def batch_process(j, batch, img, pose, gaze):
         c[i] = torch.tensor(gaze[j * batch + i])
     return a, b, c
 
-
 if __name__ == "__main__":
 
     raw_gaze, raw_image, raw_pose, raw_index = collect_data_from_mat()
@@ -50,20 +49,18 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(GazeCNN.parameters(), lr=0.0001)
     criterion = torch.nn.SmoothL1Loss(reduction="mean")
 
-    if is_gpu: # switch to GPU device is applicable
-        GazeCNN = GazeCNN.cuda()
-        criterion = criterion.cuda()
-
     batch = 512
     train_range = int(ltrain / batch)
     test_range = int(lvaild / batch)
 
     train_loss_list = []
     valid_loss_list = []
-    for epoch in range(40):
-        for i in range(train_range):
+    for epoch in range(35):
+        for i in tqdm(range(train_range)):
             img, pose, gaze = batch_process(i, batch, t_image, t_pose_2D, t_gaze_2D)
             if is_gpu:
+                GazeCNN = GazeCNN.cuda()
+                criterion = criterion.cuda()
                 img = img.cuda()
                 pose = pose.cuda()
                 gaze = gaze.cuda()
@@ -76,22 +73,25 @@ if __name__ == "__main__":
         train_loss = 0
         for k in tqdm(range(train_range - 1)):
             img, pose, gaze = batch_process(k, batch, t_image, t_pose_2D, t_gaze_2D)
-            GazeCNN = GazeCNN.cpu()
+            GazeCNN = GazeCNN
             gaze_pred_2D = GazeCNN(img, pose)
             train_loss += mean_angle_loss(gaze_pred_2D, gaze)
-
-        train_loss_list.append(train_loss/train_range)
+        train_loss = train_loss / (train_range - 1)
+        train_loss_list.append(train_loss)
 
         ## validation result
         valid_loss = 0
         for j in tqdm(range(test_range - 1)):
             img, pose, gaze = batch_process(j, batch, v_image, v_pose_2D, v_gaze_2D)
-            GazeCNN = GazeCNN.cpu()
+            GazeCNN = GazeCNN
             gaze_pred_2D = GazeCNN(img, pose)
             valid_loss += mean_angle_loss(gaze_pred_2D, gaze)
-        valid_loss_list.append(valid_loss/test_range)
-        print("train_loss, valid_loss = [{},{}]".format(train_loss/(train_range-1), valid_loss/(test_range-1)))
+        valid_loss = valid_loss / (test_range - 1)
+        valid_loss_list.append(valid_loss)
 
+        print("train_loss, valid_loss = [{},{}]".format(train_loss, valid_loss))
 
+    print("valid loss result:", valid_loss_list)
+    print("train loss result:", train_loss_list)
 
 

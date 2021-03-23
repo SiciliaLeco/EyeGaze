@@ -4,6 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import cv2 as cv
 import torch
+import math
 
 def read_eye_data(mat):
     '''
@@ -108,9 +109,10 @@ def mean_angle_loss(pred, truth):
     pred = pred.detach().numpy()
     ans = 0
     for i in range(len(pred)):
-        p_x, p_y, p_z = gaze2D_to_3D(pred[i])
-        t_x, t_y, t_z = gaze2D_to_3D(truth[i])
-        angles = p_x * t_x + p_y * t_y + p_z * t_z
-        ans += torch.acos(angles) * 180 / np.pi
-
+        p_x, p_y, p_z = (pred[i][j] for j in range(3))
+        t_x, t_y, t_z = (truth[i][j] for j in range(3))
+        # print("p_x={}, p_y={}, p_z={}".format(p_x, p_y, p_z))
+        # print("t_x={}, t_y={}, t_z={}".format(t_x, t_y, t_z))
+        angles = (p_x * t_x + p_y * t_y + p_z * t_z)/math.sqrt(p_x**2+p_y**2+p_z**2) * math.sqrt(t_x**2+t_y**2+t_z**2)
+        ans += math.acos(angles) * 180 / np.pi
     return ans / len(pred)

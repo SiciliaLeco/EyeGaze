@@ -96,7 +96,7 @@ def gaze2D_to_3D(gaze):
     norm = np.sqrt(x**2 + y**2 + z**2)
     x /= norm
     y /= norm
-    z /= norm
+    z /= norm # all normalized
     return x, y, z
 
 
@@ -112,5 +112,5 @@ def mean_angle_loss(pred, truth):
         t_x, t_y, t_z = gaze2D_to_3D(truth[i])
         angles = p_x * t_x + p_y * t_y + p_z * t_z
         ans += torch.acos(angles) * 180 / np.pi
-
+        torch.from_numpy(angles)
     return ans / len(pred)

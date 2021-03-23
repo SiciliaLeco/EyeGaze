@@ -34,7 +34,7 @@ def collect_data_from_mat():
     image = list()
     index = list()
     pose = list()
-    for matfile in tqdm(mat_files):
+    for matfile in tqdm(mat_files[:5]):
         pnum = matfile.split('/')[-2]  # pxx
         pday = matfile.split('/')[-1].split('.')[0] # day0x
         index.append(pnum + '/' + pday)
