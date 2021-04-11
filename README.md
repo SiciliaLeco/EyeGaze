@@ -25,3 +25,11 @@ Week 4-5: In-depth learning for Appearanced-based gaze in-the-wild.
 Week 6: Implement multi-modal CNN for one-eye gaze estimation.
 
 Week 7-8: improve some techniques applied to the data.
+
+Week 9-10: Validation process, K-fold validatio and improve the result.
+
+Week 11: Learn Asymmetry technique, start of two-eye mission.
+
+Week 12: Prepare for an exam, update end.
+
+Week 13: implementing AR-Net.
