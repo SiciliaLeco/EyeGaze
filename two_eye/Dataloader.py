@@ -29,7 +29,7 @@ def collect_data_from_mat(label):
     mat_files.sort()
     i = 0
     train_gaze, train_image, train_pose, test_gaze, test_image, test_pose=[],[],[],[],[],[]
-    for matfile in tqdm(mat_files):
+    for matfile in tqdm(mat_files[:2]):
         pnum = matfile.split('/')[-2]  # pxx
         fgaze, fimage, fpose = read_eye_data(matfile, label)
         if int(pnum[1:]) < 7:

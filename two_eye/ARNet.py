@@ -10,12 +10,6 @@ def AngularErr(input,target):
     cosineLoss = nn.CosineSimilarity()
     return cosineLoss(input, target)
 
-class AngularLoss(nn.Module):
-    def __init__(self):
-        super(AngularLoss,self).__init__()
-    def forward(self, input, target):
-        return AngularErr(input,target)
-
 class Criterion(nn.Module):
     def __init__(self):
         super(Criterion, self).__init__()
@@ -24,9 +18,14 @@ class Criterion(nn.Module):
         left_pd = pred_vec[:,:2]
         right_pd = pred_vec[:,2:]
         vall = AngularErr(left_gt, left_pd)
+        vall = torch.acos(vall)
+        dvall = torch.div(1, vall)
         valr = AngularErr(right_gt, right_pd)
-        weightl = torch.mul(torch.div(1, vall), torch.add(vall, valr))
-        weightr = torch.mul(torch.div(1, valr), torch.add(vall, valr))
+        valr = torch.acos(valr)
+        dvalr = torch.div(1, valr)
+        sum = torch.add(dvalr, dvall)
+        weightl = torch.div(dvall, sum)
+        weightr = torch.div(dvalr, sum)
         return torch.add(torch.mul(weightl, vall), torch.mul(weightr, valr))
 
 ########### Base-CNN set up ############

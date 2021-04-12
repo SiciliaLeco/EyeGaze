@@ -47,13 +47,14 @@ cuda_gpu = torch.cuda.is_available()
 
 GazeNet = ARNet()
 optimizer = torch.optim.Adam(GazeNet.parameters(), lr=0.0001)
-criterion = Criterion()
-batch = 512
+# criterion = Criterion()
+criterion = torch.nn.SmoothL1Loss(reduction="mean")
+batch = 10
 train_range = int(len(train_gaze2Dl) / batch)
 test_range = int(len(test_gaze2Dl) / batch)
 
-for epoch in range(20):
-    for i in tqdm(range(train_range - 1)):
+for epoch in range(1):
+    for i in tqdm(range(2)):
         imgl, posel, gazel = batch_process(i, batch, train_imagel, train_pose2Dl, train_gaze2Dl)
         imgr, poser, gazer = batch_process(i, batch, train_imagel, train_pose2Dl, train_gaze2Dl)
         if cuda_gpu:
@@ -66,7 +67,9 @@ for epoch in range(20):
             poser = poser.cuda()
             gazer = gazer.cuda()
         gaze_pred_2D = GazeNet(imgl, imgr, posel, poser)
-        loss = criterion(gaze_pred_2D, gazel, gazer)
+        gaze_trut_2D = torch.cat([gazel, gazer], dim=1)
+        loss = criterion(gaze_pred_2D, gaze_trut_2D)
+
         loss.backward(loss.clone().detach())
         optimizer.step()
 

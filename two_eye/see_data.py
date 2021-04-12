@@ -23,11 +23,11 @@ def calc_angle(gaze1, gaze2):
 
 def collect_data_from_mat():
     mat_files = glob.glob(path+'/Normalized/**/*.mat', recursive = True)
-    for matfile in tqdm(mat_files):
+    for matfile in tqdm(mat_files[:1]):
         rgaze, rimage, rpose = read_eye_data(matfile, "right")
         lgaze, limage, lpose = read_eye_data(matfile, "left")
 
         for i in range(len(rgaze)):
-            print("left:", rpose[i])
-            print("right:", lpose[i])
+            print("left:", rgaze[i])
+            print("right:", lgaze[i])
 collect_data_from_mat()
