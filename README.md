@@ -26,7 +26,7 @@ Week 5: In-depth learn *Appearanced-based gaze in-the-wild*[1].
 
 Week 6: Implement a multi-modal CNN for single-eye gaze estimation.
 
-Week 7-8: improve some techniques applied to the data. (Normalize the vector, change of judging metrics)
+Week 7-8: improve some techniques applied to the data. (Normalize the vector, change of judging metrics) 
 
 Week 9-10: Validation process(K-fold validation), improve the result by tuning hyper-parameters.
 
