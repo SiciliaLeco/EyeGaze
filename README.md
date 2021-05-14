@@ -13,10 +13,12 @@ usability: track the eye movement, provide detailed insights into users' attenti
 
 challenges: (a) low sensor quality or unknown/challenging environments, and (b) large variations in eye region appearance.
 
+wildly-accepted methods: appearance-based estimation.
+
 notes here:https://github.com/SiciliaLeco/EyeGaze/tree/master/note
 
 
-### 2. timeline
+### 2. Timeline
 
 Week 3: Dataset observation, a general understanding of the problem.
 
