@@ -61,7 +61,7 @@ For single-eye problem, the overview of the task is to predict a 3D gaze directi
 
 To properly learn the image attribute, we apply to Deep Learning algorithms with efficiently learn the features in quick time. I followed the guidance[1] of building a multi-modal CNN, the general process is shown in Fig.1. Before the training for CNN model starts, we should preprocess the data from the dataset, that is to first detect the face from the input raw image, then use the calibration parameters to derive 3D head rotation $r$. Then is the normalisation process for eye image is to adjust the head pose direction so as to directly pointing at the camera, so each input image can be executed in the same coodrinate system.
 
-<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/CNN.jpg" alt="Pasted Graphic 1" style="zoom:30%;" />
+<img src="src/CNN.jpg" alt="Pasted Graphic 1" style="zoom:30%;" />
 
 <center>Fig.1 Workflow of gaze estimation</center>
 
@@ -73,7 +73,7 @@ We didn't directly get the head pose rotation from the record. It's calcualted f
 
 The purpose for normalisation process is to adjust the head pose direction. From the dataset we can see that the range for the head poses go wide, so the head is not always directly pointing at the camera shoot. The consequence of being in this form would reduce the accuracy for the training process because the angle of the head coordinate and the camera coordinate would influence the image representation: we need the eye image which the head coodinate's z-axis should be perpendicular to the camera coordinate panel. After the normalisation process, we can get the grey image for both eyes and head pose vectors $h$. The transforming process is shown below: 
 
-<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/camera coordinate.jpg" alt="camera coordinate" style="zoom:30%;" />
+<img src="src/camera coordinate.jpg" alt="camera coordinate" style="zoom:30%;" />
 
   <center>Fig.2 Normalisation process</center>
 
@@ -81,11 +81,21 @@ The purpose for normalisation process is to adjust the head pose direction. From
 
 The task for the CNN is to learn the mapping from the input feature. The network architecture here is the adaptation from LeNet framework. We have two input data for this model: the normalised eye image and the 2D head pose vectors, and the model would output the predicting 2D gaze vector. Here we need to convert all the 3D vectors into 2D vectors. The differences of using 2D or 3D would also be dicussed in part 5. 
 
-<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/figmodal.jpg" alt="figmodal" style="zoom:50%;" />
+<img src="src/figmodal.jpg" alt="figmodal" style="zoom:50%;" />
 
   <center>Fig.3 Multi-modal CNN</center>
 
 #### 3.2 Two-eye problem 
+
+##### 3.2.1 Problem analysis
+
+Two-eye asymmetry: 
+
+##### 3.2.2 Knowledge 
+
+
+
+##### 3.2.3 AR-E Net
 
 
 
@@ -109,7 +119,7 @@ Under the best model for single-eye estimation, the batch size is 512, adn the l
 
 I implemented K-fold validation for the single-eye model, which is to elicit $1/k$ data points from the dataset and use it as the validation data, the rest of the data is for trainning. For k = 5, got the best result at 7.82 (not improve so much). For k = 3, got best result at 8.97. For k = 10, got best result at 9.69. 
 
-<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/K-fold.jpg" alt="K-fold" style="zoom:50%;" />
+<img src="src/K-fold.jpg" alt="K-fold" style="zoom:50%;" />
 
 <center>Fig. K-fold validation outcome</center>
 
@@ -165,8 +175,13 @@ Week 13: implementing AR-Net.
 
 ### 9. Environment
 
-| cgpb0 | 1    | Ubuntu | 2x  Xeon Silver 4210 | 256GB | 3.2TB  SSD |
+|       |      |        |                      |       |            |
 | ----- | ---- | ------ | -------------------- | ----- | ---------- |
+| cgpb0 | 1    | Ubuntu | 2x  Xeon Silver 4210 | 256GB | 3.2TB  SSD |
+
+### 10. File description 
+
+
 
 ### Appendix
 
