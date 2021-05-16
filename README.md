@@ -51,17 +51,89 @@ To summarize, MPIIGaze dataset is giving images of the face, calibration setting
 
 ### 3. Method
 
-Our task is generally divided into two parts: determine single eye gaze direction for one person, and determine directions for both eyes. Each problem has distinctive method to resolve it.
+The task is generally divided into two parts: determine single eye gaze direction for one person, and determine directions for both eyes. Each problem has distinctive method to resolve it.
 
 #### 3.1 Single-eye problem
 
 ##### 3.1.1 Problem analysis
 
-For single-eye problem, the overview of the task is to predict a 3D gaze direction for one person, given his face image and head pose information. In the MPIIGaze dataset, the head pose was calculated by the calibration parameters, and the eye is extracted from the face image so we can just focus on the eye image for prediction. 
+For single-eye problem, the overview of the task is to predict a 3D gaze direction for one person, given his face image and head pose information. In the MPIIGaze dataset, the head pose was calculated by the calibration parameters, and the eye is extracted from the face image so we can just focus on the eye image for prediction instead of the whole face. Predicting an eye gaze direction from a single image can be difficult, because the conditions of the images can be very different: illuminations, eye glasses, image resolution. 
+
+To properly learn the image attribute, we apply to Deep Learning algorithms with efficiently learn the features in quick time. I followed the guidance[1] of building a multi-modal CNN, the general process is shown in Fig.1. Before the training for CNN model starts, we should preprocess the data from the dataset, that is to first detect the face from the input raw image, then use the calibration parameters to derive 3D head rotation $r$. Then is the normalisation process for eye image is to adjust the head pose direction so as to directly pointing at the camera, so each input image can be executed in the same coodrinate system.
+
+<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/CNN.jpg" alt="Pasted Graphic 1" style="zoom:30%;" />
+
+<center>Fig.1 Workflow of gaze estimation</center>
+
+##### 3.1.2 Head pose Estimation 
+
+We didn't directly get the head pose rotation from the record. It's calcualted from the calibartion parameters like screen size and intrinsic parameters from each participant's laptop camera. Since the camera can't directly point at the object, we will need to use images of Planar Mirror Reflections and to calculate the head pose vectors. Head pose could be influential for the model establishment, this would be covered in the discussion part.
+
+##### 3.1.3 Normalisation
+
+The purpose for normalisation process is to adjust the head pose direction. From the dataset we can see that the range for the head poses go wide, so the head is not always directly pointing at the camera shoot. The consequence of being in this form would reduce the accuracy for the training process because the angle of the head coordinate and the camera coordinate would influence the image representation: we need the eye image which the head coodinate's z-axis should be perpendicular to the camera coordinate panel. After the normalisation process, we can get the grey image for both eyes and head pose vectors $h$. The transforming process is shown below: 
+
+<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/camera coordinate.jpg" alt="camera coordinate" style="zoom:30%;" />
+
+  <center>Fig.2 Normalisation process</center>
+
+##### 3.1.4 Multi-modal CNN
+
+The task for the CNN is to learn the mapping from the input feature. The network architecture here is the adaptation from LeNet framework. We have two input data for this model: the normalised eye image and the 2D head pose vectors, and the model would output the predicting 2D gaze vector. Here we need to convert all the 3D vectors into 2D vectors. The differences of using 2D or 3D would also be dicussed in part 5. 
+
+<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/figmodal.jpg" alt="figmodal" style="zoom:50%;" />
+
+  <center>Fig.3 Multi-modal CNN</center>
+
+#### 3.2 Two-eye problem 
+
+
 
 ### 4. Evaluation
 
+#### 4.1 Unified Measurement
+
+To examine the model result for each training using different loss functions, gradient descents and other factors that might affect the output, we should be setting a criteria for the measurement. So the degree mean error which is to calculate the angle between two vectors is applied here. 
+
+Let’s say two **normalised** vectors $p_1=(x_1,y_1,z_1 )$, $p_2=(x_2,y_2,z_2 )$, the angle is:
+
+$ angle= ∑_{i=0}^3(p_1 [i]∗p_2 [i])$. Note we should be getting the normalised vectors here, otherwise the calculated angular erorrs can be far-fecthing.
+
+We also need to convert angles into degree, the format is: $degree= arccos⁡(angle)∗180÷\pi $.
+
+#### 4.2 Hyper parameters
+
+Under the best model for single-eye estimation, the batch size is 512, adn the learning rate is setted to be 0.0001. The loss function applied is SmoothL1Loss, and the optimizer is adamGrad. For the data splitting, I tried random splitting and splitting by person, the latter one get better result.
+
+#### 4.3 Validation 
+
+I implemented K-fold validation for the single-eye model, which is to elicit $1/k$ data points from the dataset and use it as the validation data, the rest of the data is for trainning. For k = 5, got the best result at 7.82 (not improve so much). For k = 3, got best result at 8.97. For k = 10, got best result at 9.69. 
+
+<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/K-fold.jpg" alt="K-fold" style="zoom:50%;" />
+
+<center>Fig. K-fold validation outcome</center>
+
+#### 4.4 Result 
+
+**Single-eye problem**
+
+The train-test curve is showing the trend in the below graph. Generally, the curve for both training loss and test loss are decreasing after more training times. The zigzags in the curve could be generated by the mini-batch training and adam grad. The best outcome ever for the single-eye  model is 8.92.
+
+<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/result.jpg" alt="result" style="zoom:50%;" />
+
+**Two-eye problem**
+
+
+
 ### 5. Discussion
+
+#### 5.1 Influence from head pose 
+
+#### 5.2 Influence from dimensions of vectors 
+
+
+
+
 
 ### 6. Conclusion
 
@@ -88,6 +160,13 @@ Week 11:  start of two-eye mission. Run model on left eye and right ey separatel
 Week 12: Learn Asymmetry technique, Read the paper.[2]
 
 Week 13: implementing AR-Net.
+
+### 8. Problems 
+
+### 9. Environment
+
+| cgpb0 | 1    | Ubuntu | 2x  Xeon Silver 4210 | 256GB | 3.2TB  SSD |
+| ----- | ---- | ------ | -------------------- | ----- | ---------- |
 
 ### Appendix
 
