@@ -1,4 +1,4 @@
-# ——Eye Gaze Estimation
+# Eye Gaze Estimation
 
 ### 1. Project Overview
 
@@ -106,7 +106,7 @@ In the previous work for two-eye gaze estimation, two eyes are treated indiffere
 
 AR-E net was proposed by *Appearance-Based Gaze Estimation via Evaluation-Guided Asymmetric Regression*[4]. This net is built by AR-Net and Ep-Net. Two nets have different functions. 
 
-##### ![are](/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/are.jpg)
+##### ![are](src/are.jpg)
 
   <center>Fig.4 Architecture for AR-E Net </center>
 
@@ -164,7 +164,7 @@ In this part, we dicuss about several effects that might influence the accuracy 
 
 Head pose is needed both in single-eye problem and two-eye problem. However, the problem is that, since we have normalised our data and will feed them into our network, why is still necessary to inject head poses to help us predict? This puzzle can be relieved by theoretical analysis: Normalised images was to make the eye directly looking at the camera, but we are not predicting the gaze vectors in this senario, instead, we are predicting the gaze directions for the original photos, in which the head pose would affect the final result. Leave alone head poses can have terrible of the training result, as shown in the following graph:
 
-<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/headpose.jpg" alt="headpose" style="zoom:50%;" />
+<img src="src/headpose.jpg" alt="headpose" style="zoom:50%;" />
 
 <center>Fig.7 comparing result for whether head pose is added</center>
 
@@ -172,7 +172,7 @@ Head pose is needed both in single-eye problem and two-eye problem. However, the
 
 To emphasise the necessity of using 2D vectors, I tried to use vectors with different dimensions to see the training outcome. From fig.8 we can clearly see that using 2D could convergent with no more than 10 epochs, while 3D vectors would never be like that. However, this could only indicate that this particular network structure would only be suitable for 2D vectors instead of 3D.
 
-<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/32d.jpg" alt="32d" style="zoom:45%;" />
+<img src="src/32d.jpg" alt="32d" style="zoom:45%;" />
 
 <center>Fig.8 comparing results for using 3D and 2D vectors</center>
 
