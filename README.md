@@ -1,4 +1,4 @@
-# Eye Gaze Estimation
+# ——Eye Gaze Estimation
 
 ### 1. Project Overview
 
@@ -19,7 +19,7 @@ Challenges: (a) low sensor quality or unknown/challenging environments, and (b) 
 
 #### 2.1 Gaze Estimation Methods
 
-There are two wildly accepted methods for estimating gaze direction: **model-based** and **appearance-based**. Model-based method uses 3D eyeball models and estimate the gaze direction using geometric eye features, while appearance-based method learns generic gaze estimators from large amounts of person, and head pose-independent training data.
+There are two widely accepted methods for estimating gaze direction: **model-based** and **appearance-based**. Model-based method uses 3D eyeball models and estimate the gaze direction using geometric eye features, while appearance-based method learns generic gaze estimators from large amounts of person, and head pose-independent training data.
 
 Model-based method largely depend on the requirement of external light source to detect eye feature so the modelling process could be a complexing one, and the accuracy for this method is still lower and the robustness is unclear.[1] Appearance-based gaze estimation methods directly use eye images as input and can therefore potentially work with low-resolution eye images. Since the eye images contain many information, so this method needs large amount of data than model-based for the training process.
 
@@ -37,7 +37,7 @@ The MPIIGaze dataset details are shown below:
 - 15 participants, 213,659 pictures
 
 - outside of laboratory conditions, i.e during daliy routine
-- wilder range of recording location, time, illumination and eye appearance
+- wider range of recording location, time, illumination and eye appearance
 
 How to collect: use of laptop application to let volunteers to look at a fixed place, and take pictures of their eyes. (Laptops are suited for long-term daily recordings but also because they are an important platform for *eye tracking application*.)
 
@@ -89,17 +89,32 @@ The task for the CNN is to learn the mapping from the input feature. The network
 
 ##### 3.2.1 Problem analysis
 
-Two-eye asymmetry: 
+The two-eye gaze estimation is to predict the gaze vectors for left eye and right eye for one face image. The MPI Team have made some assumptions on this: 
 
-##### 3.2.2 Knowledge 
+- user head pose can be obtained by using existing head trackers; 
+- the user should roughly fixate on the same targets with both eyes.
 
+There have been some works on the two-eye problem. In 2017’s paper *MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation*[4],  it proposed a method that set the ground truth of both eyes. They newly defined a ground truth: mean gaze vector as the output of the defining model. Through several trials, they got a rough conclusion that two-eye estimation can improve the predicted result.
 
+From the above conclusion, we know that we can predict the vectors for two eyes at one time in order to revise the outcome for predicting single gaze vectors. 
+
+#### 3.2.2 Knowledge 
+
+In the previous work for two-eye gaze estimation, two eyes are treated indifferently. But from the observation of some statistics, we can find that we cannot expect the same accuracy for two eyes, either eye has a chance to be more accurate. This observation is called two-eye asymmetry, and it's caused by the very different head poses, image qualities, and illumination on the face. 
 
 ##### 3.2.3 AR-E Net
 
+AR-E net was proposed by *Appearance-Based Gaze Estimation via Evaluation-Guided Asymmetric Regression*[4]. This net is built by AR-Net and Ep-Net. Two nets have different functions. 
 
+##### ![are](/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/are.jpg)
 
-### 4. Evaluation
+  <center>Fig.4 Architecture for AR-E Net </center>
+
+For AR-Net (Asymmetric Regression-Net), it's to predict two gaze vectors for both left and right eyes simultaneously. The salient difference compared to previous network is the loss function. AR-Net would calculate the acrcosine value for both eyes, and set them as weight in the loss function. 
+
+E-Net(Evaluation-Net) was to help further decide which eye is more reliable. It would append AR-Net and give feedback to it. 
+
+### 4. Experiments and evaluation
 
 #### 4.1 Unified Measurement
 
@@ -117,45 +132,77 @@ Under the best model for single-eye estimation, the batch size is 512, adn the l
 
 #### 4.3 Validation 
 
-I implemented K-fold validation for the single-eye model, which is to elicit $1/k$ data points from the dataset and use it as the validation data, the rest of the data is for trainning. For k = 5, got the best result at 7.82 (not improve so much). For k = 3, got best result at 8.97. For k = 10, got best result at 9.69. 
+For the validation process, I tried different dataset spliting method. In general, it can be classified as split by people and random spliting. Split by people was to elict data for one person as validation data, and rest of them are all for training. In this way, each hypothesis would be using different size of validation data. Don't know if this fluctuation would affect the result. 
+
+I implemented **K-fold validation** for the single-eye model (randomly split the dataset), which is to elicit $1/k$ data points from the dataset and use it as the validation data, the rest of the data is for trainning. For k = 5, got the best result at 7.82 (not improve so much). For k = 3, got best result at 8.97. For k = 10, got best result at 9.69. The MPI team had 6.3[1] mean degree error for this model.
 
 <img src="src/K-fold.jpg" alt="K-fold" style="zoom:50%;" />
 
-<center>Fig. K-fold validation outcome</center>
+<center>Fig.5 K-fold validation outcome</center>
 
 #### 4.4 Result 
 
 **Single-eye problem**
 
-The train-test curve is showing the trend in the below graph. Generally, the curve for both training loss and test loss are decreasing after more training times. The zigzags in the curve could be generated by the mini-batch training and adam grad. The best outcome ever for the single-eye  model is 8.92.
+I applied the previous mentioned multi-modal CNN in my work. The train-test curve is showing the trend in the below graph. It took 100 epochs to train the model. Generally, the curve for both training loss and test loss are decreasing after more training times. The zigzags in the curve could be the result of the mini-batch training and adam grad. The best outcome ever for the single-eye model is 8.92.
 
 <img src="src/result.jpg" alt="result" style="zoom:50%;" />
 
+<center>Fig.6 train-test loss curve</center>
+
 **Two-eye problem**
+
+For the two-eye problem, I first tried to use model for single-eye problem and separately predict the gaze vectors for both eyes, but the result is not always closed, this can also reveal the conclusion from MPI team, which is: we can't treat two eyes indifferently. Then I tried to combine two streams of the single-eye model together (they are to seperatly predict left and right eyes), concatenate their result and redifine the loss function as an AR-Net's form. In this way, the result didn't go well as it never convergent. Then I follow the rules by standard ARE-Net and implement the AR-Net (failed to run E-Net because CUDA are always out of memory.) For now, the best accuracy for two-eye problem stops at 13.4104.
 
 
 
 ### 5. Discussion
 
+In this part, we dicuss about several effects that might influence the accuracy of our model. 
+
 #### 5.1 Influence from head pose 
+
+Head pose is needed both in single-eye problem and two-eye problem. However, the problem is that, since we have normalised our data and will feed them into our network, why is still necessary to inject head poses to help us predict? This puzzle can be relieved by theoretical analysis: Normalised images was to make the eye directly looking at the camera, but we are not predicting the gaze vectors in this senario, instead, we are predicting the gaze directions for the original photos, in which the head pose would affect the final result. Leave alone head poses can have terrible of the training result, as shown in the following graph:
+
+<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/headpose.jpg" alt="headpose" style="zoom:50%;" />
+
+<center>Fig.7 comparing result for whether head pose is added</center>
 
 #### 5.2 Influence from dimensions of vectors 
 
+To emphasise the necessity of using 2D vectors, I tried to use vectors with different dimensions to see the training outcome. From fig.8 we can clearly see that using 2D could convergent with no more than 10 epochs, while 3D vectors would never be like that. However, this could only indicate that this particular network structure would only be suitable for 2D vectors instead of 3D.
 
+<img src="/Users/liqilin/PycharmProjects/untitled/EyeGaze/src/32d.jpg" alt="32d" style="zoom:45%;" />
+
+<center>Fig.8 comparing results for using 3D and 2D vectors</center>
+
+#### 5.3 Determine two-eye ground truth 
+
+For the two-eye estimation problem, In th  2017’s paper *MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation*, they propose a method that set the ground truth of both eyes, which is, the mean gaze vector originating from the centre of both eyes is defined as ground-truth of gaze vectors. Nonetheless, this can't acurrately represent the true relationship between two eyes. Instead, we should collect data for both eyes separately.
 
 
 
 ### 6. Conclusion
 
+MPIIGaze dataset is collected through long observations on various volunteers. The wider range of various factors make it predominant in deep learning model training. To predict the gaze vector for a  single eye, we need to convert both 3D gaze vectors (ground truth) and calculated head poses into 2D version. In this way, we can reduce the calculation complexity and also have better results for prediction. The convert process contains geometric formula and needed to be implemented using cv library. This CNN-based model takes less time to train, and can also reach high quality results. 
+
+Two-eye gaze estimation is more like an adjustment of the original result for single-eye prediction. It combines the two images and take the inter-relationship and discrepancies of two eyes into consideration. Instead of just output the raw result, this problem mainly discuss how can the predicting results feedback to the training process and have a better outcome after the adjustments. 
 
 
-### 7. Timeline
 
-Week 3: Dataset observation, a general understanding of the problem.
+### 7. My work 
+
+| Week time | Main task                | <center>Details</center>                                     |
+| --------- | ------------------------ | ------------------------------------------------------------ |
+| 3         | Lead in to the project   | - Search for previous works on gaze estimation, build a basic understanding of the problem;<br />- Look for available datasets and manageable methods for problem solving. |
+| 4         | EDA                      | - Determine the method to be applied to;<br />- Explore the attributes and characteristics of the dataset, understand the labels. <br />- Understand the dataset collecting process. |
+| 5         | Learn multi-modal CNN[1] | - Get familiar with the                                      |
+
+Week 3: Lead in to the project
 
 Week 4: Determine method to be used, dataset exploration.
 
-Week 5: In-depth learn *Appearanced-based gaze in-the-wild*[1].
+Week 5: In-depth learn *Appearance-based gaze in-the-wild*[1].
 
 Week 6: Implement a multi-modal CNN for single-eye gaze estimation.
 
@@ -171,7 +218,9 @@ Week 12: Learn Asymmetry technique, Read the paper.[2]
 
 Week 13: implementing AR-Net.
 
-### 8. Problems 
+### 8. Limitations
+
+
 
 ### 9. Environment
 
@@ -179,7 +228,23 @@ Week 13: implementing AR-Net.
 | ----- | ---- | ------ | -------------------- | ----- | ---------- |
 | cgpb0 | 1    | Ubuntu | 2x  Xeon Silver 4210 | 256GB | 3.2TB  SSD |
 
-### 10. File description 
+
+
+### 10. Directory description 
+
+```
++--EyeGaze # root 
+| +--essay # essays related 
+| +--note # literature review on essays
+| +--pre # presentation slides
+| +--single_eye_normalized
+	| +--gpu # code suitable for cuda 
+	| +--train_cpu # training on cpu device
+	| +--validation 
+	| +--visualize # draw curves
+| +--src
+| +--two_eye
+```
 
 
 
@@ -190,3 +255,5 @@ Week 13: implementing AR-Net.
 [2] Funes Mora, Kenneth Alberto, Florent Monay, and Jean-Marc Odobez. "Eyediap: A database for the development and evaluation of gaze estimation algorithms from rgb and rgb-d cameras." *Proceedings of the Symposium on Eye Tracking Research and Applications*. 2014.
 
 [3] Sugano, Yusuke, Yasuyuki Matsushita, and Yoichi Sato. "Learning-by-synthesis for appearance-based 3d gaze estimation." *Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition*. 2014.
+
+[4]Zhang X, Sugano Y, Fritz M, et al. Mpiigaze: Real-world dataset and deep appearance-based gaze estimation[J]. IEEE transactions on pattern analysis and machine intelligence, 2017, 41(1): 162-175.
