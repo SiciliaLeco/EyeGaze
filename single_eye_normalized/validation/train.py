@@ -62,7 +62,7 @@ if __name__ == "__main__":
         train_range = int(ltrain / batch)
         test_range = int(lvaild / batch)
 
-        for epoch in tqdm(range(30)):#
+        for epoch in tqdm(range(40)):#
             for i in range(train_range):
                 img, pose, gaze = batch_process(i, batch, t_image, t_pose_2D, t_gaze_2D)
                 if is_gpu:

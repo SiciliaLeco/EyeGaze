@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     raw_gaze, raw_image, raw_pose, raw_index = collect_data_from_mat()
     is_gpu = torch.cuda.is_available()
-    t_gaze, t_pose, t_image, v_gaze, v_pose, v_image = get_kfold_data(10, 0, raw_gaze, raw_image, raw_pose)
+    t_gaze, t_pose, t_image, v_gaze, v_pose, v_image = get_kfold_data(5, 3, raw_gaze, raw_image, raw_pose)
     t_pose_2D, t_gaze_2D = get_2D_vector(t_pose, t_gaze)
     v_pose_2D, v_gaze_2D = get_2D_vector(v_pose, v_gaze)
 
@@ -48,22 +48,24 @@ if __name__ == "__main__":
     GazeCNN = Model()
     optimizer = torch.optim.Adam(GazeCNN.parameters(), lr=0.0001)
     criterion = torch.nn.SmoothL1Loss(reduction="mean")
+    if is_gpu:
+        criterion = criterion.cuda()
 
-    batch = 512
+    batch = 128
     train_range = int(ltrain / batch)
     test_range = int(lvaild / batch)
 
     train_loss_list = []
     valid_loss_list = []
-    for epoch in range(35):
+    for epoch in range(100):
         for i in tqdm(range(train_range)):
             img, pose, gaze = batch_process(i, batch, t_image, t_pose_2D, t_gaze_2D)
             if is_gpu:
                 GazeCNN = GazeCNN.cuda()
-                criterion = criterion.cuda()
                 img = img.cuda()
                 pose = pose.cuda()
                 gaze = gaze.cuda()
+
             gaze_pred_2D = GazeCNN(img, pose)
 
             loss = criterion(gaze_pred_2D, gaze)
@@ -72,20 +74,22 @@ if __name__ == "__main__":
 
         train_loss = 0
         for k in tqdm(range(train_range - 1)):
-            img, pose, gaze = batch_process(k, batch, t_image, t_pose_2D, t_gaze_2D)
-            GazeCNN = GazeCNN
-            gaze_pred_2D = GazeCNN(img, pose)
-            train_loss += mean_angle_loss(gaze_pred_2D, gaze)
+            timg, tpose, tgaze = batch_process(k, batch, t_image, t_pose_2D, t_gaze_2D)
+            GazeCNN = GazeCNN.cpu()
+            tgaze_pred_2D = GazeCNN(timg, tpose)
+            train_loss += mean_angle_loss(tgaze_pred_2D, tgaze)
+
         train_loss = train_loss / (train_range - 1)
         train_loss_list.append(train_loss)
 
         ## validation result
         valid_loss = 0
         for j in tqdm(range(test_range - 1)):
-            img, pose, gaze = batch_process(j, batch, v_image, v_pose_2D, v_gaze_2D)
-            GazeCNN = GazeCNN
-            gaze_pred_2D = GazeCNN(img, pose)
-            valid_loss += mean_angle_loss(gaze_pred_2D, gaze)
+            vimg, vpose, vgaze = batch_process(j, batch, v_image, v_pose_2D, v_gaze_2D)
+            GazeCNN = GazeCNN.cpu()
+            vgaze_pred_2D = GazeCNN(vimg, vpose)
+            valid_loss += mean_angle_loss(vgaze_pred_2D, vgaze)
+
         valid_loss = valid_loss / (test_range - 1)
         valid_loss_list.append(valid_loss)
 

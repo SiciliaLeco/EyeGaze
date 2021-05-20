@@ -49,17 +49,25 @@ test_range = int(ltest / batch)
 for epoch in range(30):
     for i in tqdm(range(train_range)):
         img, pose, gaze = batch_process(i, batch, train_image, train_pose2D, train_gaze2D)
-        gaze_pred_2D = GazeCNN(img, pose).cpu()
+        if cuda_gpu:
+            GazeCNN = GazeCNN.cuda()
+            criterion = criterion.cuda()
+            img = img.cuda()
+            pose = pose.cuda()
+            gaze = gaze.cuda()
 
+        gaze_pred_2D = GazeCNN(img, pose)
         loss = criterion(gaze_pred_2D, gaze)
         loss.backward()
         optimizer.step()
 
-    angle_loss=0
-    for j in tqdm(range(test_range)):
-        timg, tpose, tgaze = batch_process(j, batch, train_image, train_pose2D, train_gaze2D)
-        tgaze_pred_2D = GazeCNN(timg, tpose)
-        angle_loss += mean_angle_loss(tgaze_pred_2D, tgaze)
+    valid_loss=0
+    for j in tqdm(range(test_range - 1)):
+        vimg, vpose, vgaze = batch_process(j, batch, test_image, test_pose2D, test_gaze2D)
+        if cuda_gpu:
+            GazeCNN = GazeCNN.cpu()
+        vgaze_pred_2D = GazeCNN(vimg, vpose)
+        valid_loss += mean_angle_loss(vgaze_pred_2D, vgaze)
 
-    print("epoch", epoch, "average loss on test dataset:", angle_loss / test_range)
+    print(valid_loss / (test_range-1))
 

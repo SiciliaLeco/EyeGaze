@@ -28,13 +28,13 @@ def collect_data_from_mat():
     :param path: path of normalized data
     :return:  list of index, image, pose, gaze
     '''
-    mat_files = glob.glob(path + '/Normalized/**/*.mat', recursive = True)
+    mat_files = glob.glob('Normalized/**/*.mat', recursive = True)
     # mat_files.sort()
     gaze = list()
     image = list()
     index = list()
     pose = list()
-    for matfile in tqdm(mat_files[:5]):
+    for matfile in tqdm(mat_files):
         pnum = matfile.split('/')[-2]  # pxx
         pday = matfile.split('/')[-1].split('.')[0] # day0x
         index.append(pnum + '/' + pday)
