@@ -91,10 +91,10 @@ The task for the CNN is to learn the mapping from the input feature. The network
 
 The two-eye gaze estimation is to predict the gaze vectors for left eye and right eye for one face image. The MPI Team have made some assumptions on this: 
 
-- user head pose can be obtained by using existing head trackers; 
-- the user should roughly fixate on the same targets with both eyes.
+- User head pose can be obtained by using existing head trackers; 
+- The user should roughly fixate on the same targets with both eyes.
 
-There have been some works on the two-eye problem. In 2017’s paper *MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation*[4],  it proposed a method that set the ground truth of both eyes. They newly defined a ground truth: mean gaze vector as the output of the defining model. Through several trials, they got a rough conclusion that two-eye estimation can improve the predicted result.
+There have been some works on the two-eye problem. In 2017’s paper *MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation*[4],  it proposed a method that set the ground truth of both eyes. They newly defined a ground truth: mean gaze vector as the output of the defining model. Through several trials, they got a rough conclusion that two-eye estimation can improve the predicted result.
 
 From the above conclusion, we know that we can predict the vectors for two eyes at one time in order to revise the outcome for predicting single gaze vectors. 
 
@@ -198,7 +198,7 @@ Two-eye gaze estimation is more like an adjustment of the original result for si
 | 4         | EDA                          | - Determine the method to be applied to;<br />- Explore the attributes and characteristics of the dataset, understand the labels. <br />- Understand the dataset collecting process. |
 | 5         | Learn multi-modal CNN[1]     | - Get familiar with the process of using calibration parameters to calculate head pose rotations and normalising the images;<br />- Understand the deep learning architecture and clarify the possible problems. |
 | 6         | Implement CNN[1]             | - Based on PyTorch, Implement the multi-modal CNN with normalised images;<br />- Train the model with the dataset (dataset spliting: random spliting) |
-| 7         | Discuss about the facts      | - Consider the influence of the dimension of the vectors and head poses for the model;<br/>- Coding to prove the thinking;<br/>- Revise the dataset spliting method. |
+| 7         | Discuss about the facts      | - Consider the influence of the dimension of the vectors and head poses for the model;<br/>- Coding to prove the thinking;<br/>- Revise the dataset spliting method. <br />- Change to GPU device.
 | 8         | Improve the Result           | - Look into the bad prediction and find possible causes;<br/>- Adjust the hyperparameters and optimzers;<br/>- Use of new judging metrics (mean degree error). |
 | 9-10      | Evaluation                   | - Do the validation process, implement K-fold validation process. |
 | 11        | Start of two-eye problem     | - Run a model to predict two eye's vectors separately;<br/>- Implement a CNN (by self) based on previous architecture;<br/>- Analyze the problems occured in the two models. |
