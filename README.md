@@ -178,7 +178,7 @@ To emphasise the necessity of using 2D vectors, I tried to use vectors with diff
 
 #### 5.3 Determine two-eye ground truth 
 
-For the two-eye estimation problem, In th  2017’s paper *MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation*, they propose a method that set the ground truth of both eyes, which is, the mean gaze vector originating from the centre of both eyes is defined as ground-truth of gaze vectors. Nonetheless, this can't acurrately represent the true relationship between two eyes. Instead, we should collect data for both eyes separately.
+For the two-eye estimation problem, In th  2017’s paper *MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation*, they propose a method that set the ground truth of both eyes, which is, the mean gaze vector originating from the centre of both eyes is defined as ground-truth of gaze vectors. Nonetheless, this can't acurrately represent the true relationship between two eyes. Instead, we should collect data for both eyes separately.
 
 
 
