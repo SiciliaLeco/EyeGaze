@@ -63,7 +63,7 @@ To properly learn the image attribute, we apply to Deep Learning algorithms with
 
 <img src="src/CNN.jpg" alt="Pasted Graphic 1" style="zoom:30%;" />
 
-<center>Fig.1 Workflow of gaze estimation</center>
+<div style="text-align: center;">Fig.1 Workflow of gaze estimation</div>
 
 ##### 3.1.2 Head pose Estimation 
 
@@ -75,7 +75,7 @@ The purpose for normalisation process is to adjust the head pose direction. From
 
 <img src="src/camera coordinate.jpg" alt="camera coordinate" style="zoom:30%;" />
 
-  <center>Fig.2 Normalisation process</center>
+  <div style="text-align: center;">Fig.2 Normalisation process</div>
 
 ##### 3.1.4 Multi-modal CNN
 
@@ -83,7 +83,7 @@ The task for the CNN is to learn the mapping from the input feature. The network
 
 <img src="src/figmodal.jpg" alt="figmodal" style="zoom:50%;" />
 
-  <center>Fig.3 Multi-modal CNN</center>
+  <div style="text-align: center;">Fig.3 Multi-modal CNN</div>
 
 #### 3.2 Two-eye problem 
 
@@ -108,7 +108,7 @@ AR-E net was proposed by *Appearance-Based Gaze Estimation via Evaluation-Guided
 
 ##### ![are](src/are.jpg)
 
-  <center>Fig.4 Architecture for AR-E Net </center>
+  <div style="text-align: center;">Fig.4 Architecture for AR-E Net </div>
 
 For AR-Net (Asymmetric Regression-Net), it's to predict two gaze vectors for both left and right eyes simultaneously. The salient difference compared to previous network is the loss function. AR-Net would calculate the acrcosine value for both eyes, and set them as weight in the loss function. 
 
@@ -138,7 +138,7 @@ I implemented **K-fold validation** for the single-eye model (randomly split the
 
 <img src="src/K-fold.jpg" alt="K-fold" style="zoom:50%;" />
 
-<center>Fig.5 K-fold validation outcome</center>
+<div style="text-align: center;">Fig.5 K-fold validation outcome</div>
 
 #### 4.4 Result 
 
@@ -148,7 +148,7 @@ I applied the previous mentioned multi-modal CNN in my work. The train-test curv
 
 <img src="src/result.jpg" alt="result" style="zoom:50%;" />
 
-<center>Fig.6 train-test loss curve</center>
+<div style="text-align: center;">Fig.6 train-test loss curve</div>
 
 **Two-eye problem**
 
@@ -166,7 +166,7 @@ Head pose is needed both in single-eye problem and two-eye problem. However, the
 
 <img src="src/headpose.jpg" alt="headpose" style="zoom:50%;" />
 
-<center>Fig.7 comparing result for whether head pose is added</center>
+<div style="text-align: center;">Fig.7 comparing result for whether head pose is added</div>
 
 #### 5.2 Influence from dimensions of vectors 
 
@@ -174,11 +174,11 @@ To emphasise the necessity of using 2D vectors, I tried to use vectors with diff
 
 <img src="src/32d.jpg" alt="32d" style="zoom:45%;" />
 
-<center>Fig.8 comparing results for using 3D and 2D vectors</center>
+<div style="text-align: center;">Fig.8 comparing results for using 3D and 2D vectors</div>
 
 #### 5.3 Determine two-eye ground truth 
 
-For the two-eye estimation problem, In 2017’s paper *MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation*, they propose a method that set the ground truth of both eyes, which is, the mean gaze vector originating from the centre of both eyes is defined as ground-truth of gaze vectors. Nonetheless, this can't acurrately represent the true relationship between two eyes. Instead, we should collect data for both eyes separately.
+For the two-eye estimation problem, In th  2017’s paper *MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation*, they propose a method that set the ground truth of both eyes, which is, the mean gaze vector originating from the centre of both eyes is defined as ground-truth of gaze vectors. Nonetheless, this can't acurrately represent the true relationship between two eyes. Instead, we should collect data for both eyes separately.
 
 
 
@@ -192,33 +192,27 @@ Two-eye gaze estimation is more like an adjustment of the original result for si
 
 ### 7. My work 
 
-| Week time | Main task                | <center>Details</center>                                     |
-| --------- | ------------------------ | ------------------------------------------------------------ |
-| 3         | Lead in to the project   | - Search for previous works on gaze estimation, build a basic understanding of the problem;<br />- Look for available datasets and manageable methods for problem solving. |
-| 4         | EDA                      | - Determine the method to be applied to;<br />- Explore the attributes and characteristics of the dataset, understand the labels. <br />- Understand the dataset collecting process. |
-| 5         | Learn multi-modal CNN[1] | - Get familiar with the                                      |
+| Week time | Main task                    | <center>Details</center>                                     |
+| --------- | ---------------------------- | ------------------------------------------------------------ |
+| 3         | Lead in to the project       | - Search for previous works on gaze estimation, build a basic understanding of the problem;<br />- Look for available datasets and manageable methods for problem solving. |
+| 4         | EDA                          | - Determine the method to be applied to;<br />- Explore the attributes and characteristics of the dataset, understand the labels. <br />- Understand the dataset collecting process. |
+| 5         | Learn multi-modal CNN[1]     | - Get familiar with the process of using calibration parameters to calculate head pose rotations and normalising the images;<br />- Understand the deep learning architecture and clarify the possible problems. |
+| 6         | Implement CNN[1]             | - Based on PyTorch, Implement the multi-modal CNN with normalised images;<br />- Train the model with the dataset (dataset spliting: random spliting) |
+| 7         | Discuss about the facts      | - Consider the influence of the dimension of the vectors and head poses for the model;<br/>- Coding to prove the thinking;<br/>- Revise the dataset spliting method. |
+| 8         | Improve the Result           | - Look into the bad prediction and find possible causes;<br/>- Adjust the hyperparameters and optimzers;<br/>- Use of new judging metrics (mean degree error). |
+| 9-10      | Evaluation                   | - Do the validation process, implement K-fold validation process. |
+| 11        | Start of two-eye problem     | - Run a model to predict two eye's vectors separately;<br/>- Implement a CNN (by self) based on previous architecture;<br/>- Analyze the problems occured in the two models. |
+| 12        | Learn Asymmetry technique[5] | - Learn the architecture of AR-E Net.                        |
+| 13        | Implement AR-Net             | - Based on the paper[5], implement AR Net; <br/>- Tune the structure and improve the result. |
 
-Week 3: Lead in to the project
 
-Week 4: Determine method to be used, dataset exploration.
-
-Week 5: In-depth learn *Appearance-based gaze in-the-wild*[1].
-
-Week 6: Implement a multi-modal CNN for single-eye gaze estimation.
-
-Week 7: think of relationship and influence that 3D head pose, 3D gaze vectors. Code to prove the thinking.
-
-Week 8: improve some techniques applied to the data. (Normalize the vector, change of judging metrics) 
-
-Week 9-10: Validation process(K-fold validation), improve the result by tuning hyper-parameters.
-
-Week 11:  start of two-eye mission. Run model on left eye and right ey separately.  
-
-Week 12: Learn Asymmetry technique, Read the paper.[2]
-
-Week 13: implementing AR-Net.
 
 ### 8. Limitations
+
+1. The model for single-eye problem hasn't go through cross-dataset validation. If applicable, can use other datasets like Eyediap[2] to test the model outcome, so to improve the architecture's generalization ability.
+2. The self-designed CNN didn't work well in predicting the result, further adjustment and revision is needed in order to better run the model.
+3. The AR-E Net costs too much memory when training the model, So during my work, CUDA is out of memory and can not go on training it. AR-E Net is relatively complex, a simpler but also effective model is needed to address the two-eye problem.
+4. This project didn't do much about decrease noises in the training image. However the poor illuminations, coverings like eye-glasses can reduce the accuracy of the CNN, so for further work, the preprocess metrics for the dataset is needed. 
 
 
 
@@ -256,4 +250,6 @@ Week 13: implementing AR-Net.
 
 [3] Sugano, Yusuke, Yasuyuki Matsushita, and Yoichi Sato. "Learning-by-synthesis for appearance-based 3d gaze estimation." *Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition*. 2014.
 
-[4]Zhang X, Sugano Y, Fritz M, et al. Mpiigaze: Real-world dataset and deep appearance-based gaze estimation[J]. IEEE transactions on pattern analysis and machine intelligence, 2017, 41(1): 162-175.
+[4] Zhang X, Sugano Y, Fritz M, et al. Mpiigaze: Real-world dataset and deep appearance-based gaze estimation[J]. IEEE transactions on pattern analysis and machine intelligence, 2017, 41(1): 162-175.
+
+[5] Cheng Y, Lu F, Zhang X. Appearance-based gaze estimation via evaluation-guided asymmetric regression[C]//Proceedings of the European Conference on Computer Vision (ECCV). 2018: 100-115.
