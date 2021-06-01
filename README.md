@@ -61,7 +61,7 @@ For single-eye problem, the overview of the task is to predict a 3D gaze directi
 
 To properly learn the image attribute, we apply to Deep Learning algorithms with efficiently learn the features in quick time. I followed the guidance[1] of building a multi-modal CNN, the general process is shown in Fig.1. Before the training for CNN model starts, we should preprocess the data from the dataset, that is to first detect the face from the input raw image, then use the calibration parameters to derive 3D head rotation $r$. Then is the normalisation process for eye image is to adjust the head pose direction so as to directly pointing at the camera, so each input image can be executed in the same coodrinate system.
 
-![image](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/CNN.jpg)
+![](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/CNN.jpg)
 
 <div style="text-align: center;">Fig.1 Workflow of gaze estimation</div>
 
@@ -73,7 +73,7 @@ We didn't directly get the head pose rotation from the record. It's calcualted f
 
 The purpose for normalisation process is to adjust the head pose direction. From the dataset we can see that the range for the head poses go wide, so the head is not always directly pointing at the camera shoot. The consequence of being in this form would reduce the accuracy for the training process because the angle of the head coordinate and the camera coordinate would influence the image representation: we need the eye image which the head coodinate's z-axis should be perpendicular to the camera coordinate panel. After the normalisation process, we can get the grey image for both eyes and head pose vectors $h$. The transforming process is shown below: 
 
-![image](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/camera%20coordinate.jpg)
+![](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/camera%20coordinate.jpg)
 
 <div style="text-align: center;">Fig.2 Normalisation process</div>
 
@@ -81,7 +81,7 @@ The purpose for normalisation process is to adjust the head pose direction. From
 
 The task for the CNN is to learn the mapping from the input feature. The network architecture here is the adaptation from LeNet framework. We have two input data for this model: the normalised eye image and the 2D head pose vectors, and the model would output the predicting 2D gaze vector. Here we need to convert all the 3D vectors into 2D vectors. The differences of using 2D or 3D would also be dicussed in part 5. 
 
-![image](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/figmodal.jpg)
+![](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/figmodal.jpg)
 
   <div style="text-align: center;">Fig.3 Multi-modal CNN</div>
 
@@ -106,7 +106,7 @@ In the previous work for two-eye gaze estimation, two eyes are treated indiffere
 
 AR-E net was proposed by *Appearance-Based Gaze Estimation via Evaluation-Guided Asymmetric Regression*[4]. This net is built by AR-Net and Ep-Net. Two nets have different functions. 
 
-![image](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/are.jpg)
+![](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/are.jpg)
 
   <div style="text-align: center;">Fig.4 Architecture for AR-E Net </div>
 
@@ -136,7 +136,7 @@ For the validation process, I tried different dataset spliting method. In genera
 
 I implemented **K-fold validation** for the single-eye model (randomly split the dataset), which is to elicit $1/k$ data points from the dataset and use it as the validation data, the rest of the data is for trainning. For k = 5, got the best result at 7.82 (not improve so much). For k = 3, got best result at 8.97. For k = 10, got best result at 9.69. The MPI team had 6.3[1] mean degree error for this model.
 
-![image](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/K-fold.jpg)
+![](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/K-fold.jpg)
 
 <div style="text-align: center;">Fig.5 K-fold validation outcome</div>
 
@@ -146,7 +146,7 @@ I implemented **K-fold validation** for the single-eye model (randomly split the
 
 I applied the previous mentioned multi-modal CNN in my work. The train-test curve is showing the trend in the below graph. It took 100 epochs to train the model. Generally, the curve for both training loss and test loss are decreasing after more training times. The zigzags in the curve could be the result of the mini-batch training and adam grad. The best outcome ever for the single-eye model is 8.92.
 
-![image](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/result.jpg)
+![](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/result.jpg)
 
 <div style="text-align: center;">Fig.6 train-test loss curve</div>
 
@@ -164,7 +164,7 @@ In this part, we dicuss about several effects that might influence the accuracy 
 
 Head pose is needed both in single-eye problem and two-eye problem. However, the problem is that, since we have normalised our data and will feed them into our network, why is still necessary to inject head poses to help us predict? This puzzle can be relieved by theoretical analysis: Normalised images was to make the eye directly looking at the camera, but we are not predicting the gaze vectors in this senario, instead, we are predicting the gaze directions for the original photos, in which the head pose would affect the final result. Leave alone head poses can have terrible of the training result, as shown in the following graph:
 
-![image](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/headpose.jpg)
+![](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/headpose.jpg)
 
 <div style="text-align: center;">Fig.7 comparing result for whether head pose is added</div>
 
@@ -172,7 +172,7 @@ Head pose is needed both in single-eye problem and two-eye problem. However, the
 
 To emphasise the necessity of using 2D vectors, I tried to use vectors with different dimensions to see the training outcome. From fig.8 we can clearly see that using 2D could convergent with no more than 10 epochs, while 3D vectors would never be like that. However, this could only indicate that this particular network structure would only be suitable for 2D vectors instead of 3D.
 
-![image](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/32d.jpg)
+![](https://github.com/SiciliaLeco/EyeGaze/blob/master/src/32d.jpg)
 
 <div style="text-align: center;">Fig.8 comparing results for using 3D and 2D vectors</div>
 
