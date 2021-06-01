@@ -120,11 +120,11 @@ E-Net(Evaluation-Net) was to help further decide which eye is more reliable. It 
 
 To examine the model result for each training using different loss functions, gradient descents and other factors that might affect the output, we should be setting a criteria for the measurement. So the degree mean error which is to calculate the angle between two vectors is applied here. 
 
-Let’s say two **normalised** vectors $p_1=(x_1,y_1,z_1 )$, $p_2=(x_2,y_2,z_2 )$, the angle is:
+Let’s say two **normalised** vectors $$p_1=(x_1,y_1,z_1 )$$, $$p_2=(x_2,y_2,z_2 )$$, the angle is:
 
-$ angle= ∑_{i=0}^3(p_1 [i]∗p_2 [i])$. Note we should be getting the normalised vectors here, otherwise the calculated angular erorrs can be far-fecthing.
+$$ angle= ∑_{i=0}^3(p_1 [i]∗p_2 [i])$$. Note we should be getting the normalised vectors here, otherwise the calculated angular erorrs can be far-fecthing.
 
-We also need to convert angles into degree, the format is: $degree= arccos⁡(angle)∗180÷\pi $.
+We also need to convert angles into degree, the format is: $$degree= arccos⁡(angle)∗180÷\pi $$.
 
 #### 4.2 Hyper parameters
 
